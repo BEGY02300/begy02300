@@ -379,8 +379,14 @@ section.block { padding-block: clamp(2.5rem, 6vw, 4.5rem); border-top: 1px solid
 .tile .l { display: block; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .tile .v { display: block; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.25rem, 9vw, 3.5rem); line-height: 1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .tile .v.txt { font-family: var(--font-body); font-weight: 700; font-size: 1.25rem; line-height: 1.25; padding-top: 0.25rem; }
-.panel .btn { justify-self: start; border-radius: 0.75rem; padding: 0.7rem 1.1rem; }
-.panel .btn:hover { background: var(--a); color: var(--on-acc); }
+.tracker-profile, .tracker-segment-head { display: flex; align-items: center; gap: 0.75rem; }
+.tracker-profile { color: var(--muted); font-weight: 700; }
+.tracker-profile img { width: 3rem; height: 3rem; border-radius: 50%; object-fit: cover; }
+.tracker-segment { display: grid; gap: 0.75rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+.tracker-segment-head { flex-wrap: wrap; }
+.tracker-segment-head img { width: 2rem; height: 2rem; object-fit: contain; }
+.tracker-segment-head h4 { margin: 0; font-size: 1.1rem; }
+.tracker-segment-tiles .tile .v { font-size: clamp(1.25rem, 4vw, 2rem); }
 
 footer { border-top: 1px solid var(--line); padding-top: 1.5rem; margin-top: 2.5rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-family: var(--font-mono); font-size: var(--fs-small); color: var(--muted); }
 
@@ -854,21 +860,30 @@ await initializePortfolioApis(window.PORTFOLIO_CONFIG);
     }
   });
 
-  var liveFortniteStats = profileConfig.trackerStats &&
-    profileConfig.trackerStats.fortnite;
-  if (Array.isArray(liveFortniteStats)) {
-    var fortniteAccount = CONFIG.accounts.filter(function (account) {
-      return account.name === "Fortnite Tracker";
+  var trackerAccountNames = {
+    bf6: "BF6 Tracker",
+    fortnite: "Fortnite Tracker",
+    r6: "R6 Mobile Tracker"
+  };
+  Object.keys(trackerAccountNames).forEach(function (game) {
+    var liveStats = profileConfig.trackerStats &&
+      profileConfig.trackerStats[game];
+    if (!Array.isArray(liveStats)) return;
+
+    var trackerAccount = CONFIG.accounts.filter(function (account) {
+      return account.name === trackerAccountNames[game];
     })[0];
-    if (fortniteAccount) {
-      fortniteAccount.stats = {
-        example: false,
-        updated: new Date().toISOString(),
-        cta: "Voir toutes mes stats",
-        items: liveFortniteStats
-      };
-    }
-  }
+    if (!trackerAccount) return;
+
+    trackerAccount.trackerProfile = profileConfig.trackerProfiles &&
+      profileConfig.trackerProfiles[game];
+    trackerAccount.stats = {
+      example: false,
+      updated: new Date().toISOString(),
+      cta: "Voir toutes mes stats",
+      items: liveStats
+    };
+  });
 
   /* ---------- Outils ---------- */
   function h(tag, attrs) {
@@ -1388,9 +1403,72 @@ await initializePortfolioApis(window.PORTFOLIO_CONFIG);
       } else v.textContent = it.value;
       tiles.appendChild(h("div", { class: "tile", style: "--k:" + k }, h("span", { class: "l", text: it.label }), v));
     });
+    var trackerDetails = [];
+    if (a.trackerProfile) {
+      var trackerProfile = a.trackerProfile;
+      var avatarUrl = safeExternalUrl(trackerProfile.avatarUrl);
+      if (avatarUrl) {
+        trackerDetails.push(h("div", { class: "tracker-profile" },
+          h("img", {
+            src: avatarUrl,
+            alt: "Image de profil Tracker.gg de " + (trackerProfile.accountName || a.username),
+            loading: "lazy",
+            referrerpolicy: "no-referrer"
+          }),
+          h("span", { text: trackerProfile.accountName || a.username })
+        ));
+      }
+
+      var segments = Array.isArray(trackerProfile.segments)
+        ? trackerProfile.segments
+        : [];
+      segments.slice(0, 16).forEach(function (segment) {
+        if (!Array.isArray(segment.stats) || !segment.stats.length) return;
+        var segmentImageUrl = safeExternalUrl(segment.imageUrl);
+        var segmentHeading = h("div", { class: "tracker-segment-head" });
+        if (segmentImageUrl) {
+          segmentHeading.appendChild(h("img", {
+            src: segmentImageUrl,
+            alt: "",
+            loading: "lazy",
+            referrerpolicy: "no-referrer"
+          }));
+        }
+        segmentHeading.appendChild(h("h4", { text: segment.title }));
+        segmentHeading.appendChild(h("span", {
+          class: "tag",
+          text: segment.category === "weapons"
+            ? "Armes"
+            : segment.category === "modes"
+              ? "Mode"
+              : segment.type
+        }));
+
+        var segmentTiles = h("div", { class: "tiles tracker-segment-tiles" });
+        segment.stats.slice(0, 12).forEach(function (stat, statIndex) {
+          var statValue = h("span", {
+            class: "v" + (typeof stat.value === "number" ? "" : " txt"),
+            text: typeof stat.value === "number"
+              ? fr(stat.value)
+              : String(stat.value)
+          });
+          segmentTiles.appendChild(h("div", {
+            class: "tile",
+            style: "--k:" + statIndex
+          }, h("span", { class: "l", text: stat.label }), statValue));
+        });
+        trackerDetails.push(h("section", { class: "tracker-segment" },
+          segmentHeading,
+          segmentTiles
+        ));
+      });
+    }
     var btn = h("a", { class: "btn", style: "--k:2", href: a.url, target: "_blank", rel: "noopener noreferrer", text: cta + " ↗" });
     panel.appendChild(head);
     panel.appendChild(tiles);
+    trackerDetails.forEach(function (element) {
+      panel.appendChild(element);
+    });
     if (note) panel.appendChild(h("p", {
       class: "activity-note" + (robloxActivity.status === "error" ? " error" : ""),
       text: note

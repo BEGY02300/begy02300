@@ -20,7 +20,8 @@
 - Pour les API non officielles (PSN, Epic), prévoir un cache (`caches.default`) pour limiter les appels et les risques de blocage.
 
 ## Gestion des erreurs & fallback
-- Xbox, Ubisoft, EA, Instagram, trackers (sauf Fortnite via `fortnite-api.com`) : **pas d’intégration dynamique**. Conserver le champ `notice` et les données manuelles.
+- Xbox, Ubisoft, EA, Instagram : **pas d’intégration dynamique**. Conserver le champ `notice` et les données manuelles.
+- Les statistiques Tracker.gg de Fortnite, BF6 et R6 Mobile passent par `/api/tracker/<jeu>` et le secret `TRACKER_API_KEY`; conserver les statistiques manuelles en repli.
 - Si une Function renvoie 501 (non configurée) ou 502 (API indisponible), le client masque la section dynamique et laisse le fallback statique.
 
 ## Style de code

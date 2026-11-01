@@ -1,15 +1,17 @@
 import * as discord from "./discord.js";
-import * as fortnite from "./fortnite.js";
 import * as gitlab from "./gitlab.js";
 import * as roblox from "./roblox.js";
 import * as steam from "./steam.js";
+import * as tracker from "./tracker.js";
 
 const API_LOADERS = [
   { id: "steam", load: steam.fetchData },
   { id: "roblox", load: roblox.fetchData },
   { id: "discord", load: discord.fetchData },
   { id: "gitlab", load: gitlab.fetchData },
-  { id: "fortnite", load: fortnite.fetchData }
+  { id: "tracker-fortnite", load: () => tracker.fetchData("fortnite") },
+  { id: "tracker-bf6", load: () => tracker.fetchData("bf6") },
+  { id: "tracker-r6", load: () => tracker.fetchData("r6") }
 ];
 
 function findSocial(config, name) {
@@ -80,9 +82,12 @@ function applyResult(config, id, data) {
     return;
   }
 
-  if (id === "fortnite") {
+  if (id.startsWith("tracker-")) {
+    const game = id.slice("tracker-".length);
     config.trackerStats = config.trackerStats || {};
-    config.trackerStats.fortnite = data.stats;
+    config.trackerStats[game] = data.stats;
+    config.trackerProfiles = config.trackerProfiles || {};
+    config.trackerProfiles[game] = data;
   }
 }
 

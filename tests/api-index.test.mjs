@@ -52,8 +52,24 @@ test("agrège les API disponibles, met à jour la configuration et tolère les e
         }
       });
     }
-    if (url === "/api/fortnite") {
+    if (url === "/api/tracker/fortnite" || url === "/api/fortnite") {
       return Response.json({ error: "Not configured" }, { status: 501 });
+    }
+    if (url === "/api/tracker/bf6" || url === "/api/tracker/r6") {
+      return Response.json({
+        data: {
+          accountName: "BEGY02300",
+          avatarUrl: "https://example.test/tracker-avatar.png",
+          stats: [{ label: "K/D", value: 1.5 }],
+          segments: [{
+            type: "weapon",
+            title: "Rifle",
+            category: "weapons",
+            imageUrl: "https://example.test/rifle.png",
+            stats: [{ label: "Kills", value: 30 }]
+          }]
+        }
+      });
     }
     assert.match(url, /gitlab\.com\/api\/v4\/users\?username=BEGY02/);
     return Response.json([{
@@ -85,7 +101,13 @@ test("agrège les API disponibles, met à jour la configuration et tolère les e
     assert.equal(config.socials[1].profile.badges[0], "Early Supporter");
     assert.equal(config.socials[2].username, "BEGY02");
     assert.equal(config.socials[2].description, "Projets");
-    assert.equal(statuses.find((item) => item.id === "fortnite").ok, false);
+    assert.equal(statuses.find((item) => item.id === "tracker-fortnite").ok, false);
+    assert.equal(statuses.find((item) => item.id === "tracker-bf6").ok, true);
+    assert.equal(statuses.find((item) => item.id === "tracker-r6").ok, true);
+    assert.deepEqual(config.trackerStats.bf6, [{ label: "K/D", value: 1.5 }]);
+    assert.deepEqual(config.trackerStats.r6, [{ label: "K/D", value: 1.5 }]);
+    assert.equal(config.trackerProfiles.r6.avatarUrl, "https://example.test/tracker-avatar.png");
+    assert.equal(config.trackerProfiles.r6.segments[0].title, "Rifle");
     assert.equal(window.PORTFOLIO_API_DATA.steam.totalGames, 1);
   } finally {
     globalThis.fetch = originalFetch;

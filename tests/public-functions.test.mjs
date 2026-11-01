@@ -15,6 +15,7 @@ async function loadFunction(name) {
 const { onRequest: onRobloxRequest } = await loadFunction("roblox");
 const { onRequest: onDiscordRequest } = await loadFunction("discord");
 const { onRequest: onFortniteRequest } = await loadFunction("fortnite");
+const { onRequest: onTrackerRequest } = await loadFunction("tracker/[game]");
 const originalFetch = globalThis.fetch;
 const originalCaches = globalThis.caches;
 
@@ -163,6 +164,130 @@ test("Fortnite Function masque la clé et normalise les statistiques", async () 
   assert.equal(body.data.stats[0].value, 1.5);
   assert.equal(body.data.stats[1].value, 9);
   assert.equal(text.includes("test-fortnite-key"), false);
+});
+
+test("Tracker Function renvoie 501 sans clé sans appeler le fournisseur", async () => {
+  let fetchCalled = false;
+  globalThis.fetch = async () => {
+    fetchCalled = true;
+    throw new Error("Unexpected request");
+  };
+
+  const response = await onTrackerRequest({
+    request: makeRequest("/api/tracker/fortnite"),
+    env: {},
+    params: { game: "fortnite" }
+  });
+
+  assert.equal(response.status, 501);
+  assert.equal(fetchCalled, false);
+});
+
+test("Tracker Function normalise les stats et masque la clé API", async () => {
+  globalThis.fetch = async (input, options) => {
+    assert.equal(
+      String(input),
+      "https://public-api.tracker.gg/v2/bf6/standard/profile/ea/1014659847596"
+    );
+    assert.equal(options.headers["TRN-Api-Key"], "test-tracker-key");
+    return Response.json({
+      data: {
+        platformInfo: {
+          platformUserHandle: "BEGY02300",
+          avatarUrl: "https://tracker.example/avatar.png"
+        },
+        segments: [{
+          type: "overview",
+          stats: {
+            kd: { value: 1.25, displayValue: "1.25" },
+            wins: { value: 17, displayValue: "17" },
+            matchesPlayed: { value: 40, displayValue: "40" }
+          }
+        }, {
+          type: "weapon",
+          attributes: { name: "Rifle" },
+          metadata: { imageUrl: "https://tracker.example/rifle.png" },
+          stats: {
+            kills: { value: 120, displayValue: "120" },
+            accuracy: { value: 0.42, displayValue: "42%" }
+          }
+        }, {
+          type: "playlist",
+          attributes: { playlistName: "Ranked" },
+          stats: {
+            wins: { value: 8, displayValue: "8" }
+          }
+        }]
+      }
+    });
+  };
+
+  const response = await onTrackerRequest({
+    request: makeRequest("/api/tracker/bf6"),
+    env: { TRACKER_API_KEY: "test-tracker-key" },
+    params: { game: "bf6" }
+  });
+  const text = await response.text();
+  const body = JSON.parse(text);
+
+  assert.equal(response.status, 200);
+  assert.equal(body.data.accountName, "BEGY02300");
+  assert.equal(body.data.avatarUrl, "https://tracker.example/avatar.png");
+  assert.deepEqual(body.data.stats.map((stat) => stat.label), [
+    "K/D",
+    "Victoires",
+    "Parties"
+  ]);
+  assert.deepEqual(body.data.segments.map((segment) => segment.category), [
+    "other",
+    "weapons",
+    "modes"
+  ]);
+  assert.equal(body.data.segments[1].title, "Rifle");
+  assert.equal(body.data.segments[1].imageUrl, "https://tracker.example/rifle.png");
+  assert.equal(body.data.segments[1].stats[1].value, "42%");
+  assert.equal(body.data.segments[2].title, "Ranked");
+  assert.equal(body.data.stats[0].value, 1.25);
+  assert.equal(text.includes("test-tracker-key"), false);
+});
+
+test("Tracker Function accepte la variable locale historique TRACKER_GG", async () => {
+  globalThis.fetch = async (input, options) => {
+    assert.equal(options.headers["TRN-Api-Key"], "test-tracker-key");
+    return Response.json({
+      data: {
+        segments: [{
+          type: "overview",
+          stats: { kd: { value: 1, displayValue: "1.00" } }
+        }]
+      }
+    });
+  };
+
+  const response = await onTrackerRequest({
+    request: makeRequest("/api/tracker/r6"),
+    env: { TRACKER_GG: "test-tracker-key" },
+    params: { game: "r6" }
+  });
+
+  assert.equal(response.status, 200);
+});
+
+test("Tracker Function refuse un titre non autorisé", async () => {
+  let fetchCalled = false;
+  globalThis.fetch = async () => {
+    fetchCalled = true;
+    throw new Error("Unexpected request");
+  };
+
+  const response = await onTrackerRequest({
+    request: makeRequest("/api/tracker/arbitrary"),
+    env: { TRACKER_API_KEY: "test-tracker-key" },
+    params: { game: "arbitrary" }
+  });
+
+  assert.equal(response.status, 404);
+  assert.equal(fetchCalled, false);
 });
 
 test("les Functions refusent les origines étrangères", async () => {
