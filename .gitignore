@@ -1,0 +1,6 @@
+.dev.vars
+.env
+.env.*
+!.env.example
+.env.exemple
+node_modules/

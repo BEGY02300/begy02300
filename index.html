@@ -1,0 +1,1508 @@
+<title>Auguste BEGY02300</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Caveat:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Patrick+Hand&display=swap">
+<style>
+/* Layout : une fiche joueur. Hero en deux colonnes, carrousel des plateformes, puis un paquet de cartes (une bannière et une couleur par compte) avec un panneau de stats dessous qui suit la carte du dessus. */
+:root {
+  --bg: #E8ECEF;
+  --surface: #F5F7F8;
+  --fg: #0F1419;
+  --muted: #4B5560;
+  --line: #C3CBD2;
+  --accent: #2B3BFF;
+  --accent-ink: #FFFFFF;
+  --ok: #0E8A4E;
+  --warn: #A8680B;
+  --bad: #C23A3A;
+  --off: #7B8691;
+
+  /* Couleurs propres à chaque compte, dérivées de la teinte --ah */
+  --acc-s: 74%;
+  --acc-l: 42%;
+  --on-acc: #FFFFFF;
+  --ban-s: 75%;
+  --ban-l1: 84%;
+  --ban-l2: 72%;
+  --pat-s: 80%;
+  --pat-l: 45%;
+  --pat-a: 0.35;
+
+  --font-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  --fs-small: 0.8125rem;
+  --fs-body: 1rem;
+  --fs-lead: clamp(1.25rem, 3.4vw, 1.75rem);
+  --fs-h2: clamp(2.25rem, 7vw, 3.5rem);
+  --fs-hero: clamp(5rem, 24vw, 12rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1015;
+    --surface: #151A21;
+    --fg: #E8ECF0;
+    --muted: #98A3AF;
+    --line: #29313B;
+    --accent: #00F3FF;
+    --accent-ink: #0D1015;
+    --ok: #5BD68B;
+    --warn: #E5B040;
+    --bad: #F26B6B;
+    --off: #6B7682;
+    --acc-s: 90%;
+    --acc-l: 72%;
+    --on-acc: #0D1015;
+    --ban-s: 55%;
+    --ban-l1: 22%;
+    --ban-l2: 13%;
+    --pat-s: 85%;
+    --pat-l: 65%;
+    --pat-a: 0.3;
+    color-scheme: dark;
+  }
+  :root:not([data-theme="light"]) body {
+    background-image:
+      radial-gradient(circle at 15% 15%, rgb(0 243 255 / 0.08), transparent 40%),
+      radial-gradient(circle at 85% 85%, rgb(168 85 247 / 0.08), transparent 40%);
+  }
+  :root:not([data-theme="light"]) .card,
+  :root:not([data-theme="light"]) .acct-card,
+  :root:not([data-theme="light"]) .panel {
+    background-color: rgb(15 23 42 / 0.78);
+    backdrop-filter: blur(14px);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1015;
+  --surface: #151A21;
+  --fg: #E8ECF0;
+  --muted: #98A3AF;
+  --line: #29313B;
+  --accent: #00F3FF;
+  --accent-ink: #0D1015;
+  --ok: #5BD68B;
+  --warn: #E5B040;
+  --bad: #F26B6B;
+  --off: #6B7682;
+  --acc-s: 90%;
+  --acc-l: 72%;
+  --on-acc: #0D1015;
+  --ban-s: 55%;
+  --ban-l1: 22%;
+  --ban-l2: 13%;
+  --pat-s: 85%;
+  --pat-l: 65%;
+  --pat-a: 0.3;
+  color-scheme: dark;
+}
+:root[data-theme="dark"] body {
+  background-image:
+    radial-gradient(circle at 15% 15%, rgb(0 243 255 / 0.08), transparent 40%),
+    radial-gradient(circle at 85% 85%, rgb(168 85 247 / 0.08), transparent 40%);
+}
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .acct-card,
+:root[data-theme="dark"] .panel {
+  background-color: rgb(15 23 42 / 0.78);
+  backdrop-filter: blur(14px);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 2rem;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--bg);
+  z-index: 10;
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+
+/* En-tête */
+.top {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 9;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.top .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.25rem 1.5rem; padding-block: 0.75rem;
+}
+.mark { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; }
+.top nav { display: flex; gap: 1.25rem; }
+.top nav a { font-family: var(--font-mono); font-size: var(--fs-small); text-transform: uppercase; letter-spacing: 0.08em; text-decoration: none; color: var(--muted); padding-block: 0.25rem; }
+.top nav a:hover { color: var(--accent); }
+.theme-toggle {
+  font-family: var(--font-mono); font-size: var(--fs-small); text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--fg); background: transparent;
+  border: 1px solid var(--line); padding: 0.35rem 0.6rem; cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Hero */
+.hero { display: grid; gap: 2.5rem; padding-block: clamp(2rem, 6vw, 4.5rem) clamp(2.5rem, 6vw, 4rem); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 860px) { .hero { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: end; } }
+.hero .eyebrow, .hero h1, .hero .lead, .hero .loop, .hero aside {
+  animation: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(var(--d, 0) * 110ms);
+}
+.hero h1 { --d: 1; }
+.hero .lead { --d: 2; }
+.hero .loop { --d: 3; }
+.hero aside { --d: 3; }
+.eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.75rem; font-family: var(--font-mono); font-size: var(--fs-small); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0 0 1rem; }
+.sep { color: var(--line); }
+.presence {
+  --pc: var(--off);
+  display: inline-flex; align-items: baseline; gap: 0.5rem; min-width: 0;
+  font-family: var(--font-body); font-size: 0.9375rem; letter-spacing: 0; text-transform: none; color: var(--fg);
+}
+.presence[data-state="ok"] { --pc: var(--ok); }
+.presence[data-state="warn"] { --pc: var(--warn); }
+.presence[data-state="bad"] { --pc: var(--bad); }
+.presence .dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--pc); flex: none; align-self: center; box-shadow: 0 0 0 3px transparent; }
+.presence[data-state="ok"] .dot { animation: ping 2.4s ease-out infinite; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pc) 55%, transparent); } 70%, 100% { box-shadow: 0 0 0 7px transparent; } }
+.presence .txt { min-width: 0; overflow-wrap: anywhere; }
+.presence .main { font-weight: 700; }
+.presence .sub { color: var(--muted); }
+h1 {
+  font-family: var(--font-display); font-weight: 800; text-transform: uppercase;
+  font-size: var(--fs-hero); line-height: 0.82; letter-spacing: -0.01em; margin: 0 0 1.5rem;
+  overflow-wrap: anywhere;
+}
+.lead { font-size: var(--fs-lead); line-height: 1.3; font-weight: 500; margin: 0 0 1.5rem; max-width: 22ch; text-wrap: balance; }
+.loop { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: var(--fs-small); text-transform: uppercase; letter-spacing: 0.06em; }
+.loop span.step { border: 1px solid var(--fg); padding: 0.3rem 0.7rem; }
+.loop span.step:last-of-type { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.loop .arrow { color: var(--muted); }
+.loop .again { display: inline-block; font-size: 1.25rem; color: var(--accent); animation: spin 9s linear infinite; }
+@keyframes spin { to { transform: rotate(-360deg); } }
+
+.card { background: var(--surface); border: 1px solid var(--line); padding: 1.25rem; }
+.card h2 { font-family: var(--font-mono); font-size: var(--fs-small); font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0 0 0.75rem; }
+.card dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem 1.25rem; align-items: baseline; }
+.card dt { font-size: var(--fs-small); color: var(--muted); }
+.card dd { margin: 0; font-family: var(--font-mono); font-size: 0.9375rem; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+
+/* Sections */
+section.block { padding-block: clamp(2.5rem, 6vw, 4.5rem); border-top: 1px solid var(--line); }
+.head { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem; }
+.head h2 { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: var(--fs-h2); line-height: 0.95; margin: 0; text-wrap: balance; }
+.head h2 .pt { color: var(--accent); }
+.head p { margin: 0.5rem 0 0; color: var(--muted); max-width: 48ch; }
+.head .eyebrow { margin: 0 0 0.75rem; }
+
+/* Carrousel des plateformes */
+.ctrl { display: flex; gap: 0.5rem; }
+.ctrl button, .copy {
+  font-family: var(--font-mono); cursor: pointer; background: transparent; color: var(--fg);
+  border: 1px solid var(--fg);
+}
+.ctrl button { width: 2.75rem; height: 2.75rem; font-size: 1.125rem; }
+.ctrl button:hover:not(:disabled) { background: var(--fg); color: var(--bg); }
+.ctrl button:disabled { opacity: 0.3; cursor: default; }
+.track {
+  display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding-bottom: 1rem; scrollbar-width: thin; scrollbar-color: var(--line) transparent;
+}
+.plat {
+  flex: 0 0 min(19rem, 80%); scroll-snap-align: start;
+  display: flex; flex-direction: column; gap: 1rem; min-width: 0;
+}
+.mono-letter {
+  width: 3.5rem; height: 3.5rem; display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 800; font-size: 2rem; text-transform: uppercase;
+  background: var(--accent); color: var(--accent-ink); flex: none;
+}
+.plat.off .mono-letter { background: transparent; color: var(--muted); border: 1px dashed var(--muted); }
+.plat h3 { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.75rem; line-height: 1; margin: 0; }
+.plat .acct { font-family: var(--font-mono); font-size: 0.9375rem; color: var(--muted); margin: 0.35rem 0 0; overflow-wrap: anywhere; }
+.badge { align-self: flex-start; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.15rem 0.5rem; border: 1px solid var(--accent); color: var(--accent); }
+.plat.off .badge { border-color: var(--muted); color: var(--muted); }
+.plat .foot { margin-top: auto; display: flex; flex-direction: column; gap: 0.75rem; }
+.plat .note { margin: 0; font-size: var(--fs-small); color: var(--muted); }
+.games { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.games li { font-size: var(--fs-small); border: 1px solid var(--line); padding: 0.1rem 0.5rem; background: var(--bg); }
+.activity-summary { display: grid; gap: 0.5rem; padding-top: 0.25rem; border-top: 1px solid var(--line); }
+.activity-heading { margin: 0; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.activity-list { display: grid; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.activity-list li { display: flex; justify-content: space-between; gap: 0.75rem; min-width: 0; font-size: var(--fs-small); }
+.activity-game-name { min-width: 0; overflow-wrap: anywhere; }
+.activity-game-meta { color: var(--muted); text-align: right; white-space: nowrap; }
+.activity-details { border-top: 1px solid var(--line); padding-top: 0.5rem; }
+.activity-details summary { color: var(--accent); cursor: pointer; font-size: var(--fs-small); }
+.activity-details .games { max-height: 12rem; overflow: auto; margin-top: 0.5rem; }
+.activity-message { margin: 0; color: var(--muted); font-size: var(--fs-small); overflow-wrap: anywhere; }
+.activity-message.error { color: var(--bad); }
+.activity-note { margin: 0; color: var(--muted); font-size: var(--fs-small); }
+.activity-note.error { color: var(--bad); }
+.activity-avatar { width: 3rem; height: 3rem; border-radius: 50%; object-fit: cover; }
+.btn { display: inline-block; text-align: center; padding: 0.6rem 1rem; text-decoration: none; background: var(--fg); color: var(--bg); font-weight: 700; font-size: 0.9375rem; }
+.btn:hover { background: var(--accent); color: var(--accent-ink); }
+
+/* Couleurs d'un compte (cartes et panneau) */
+.acct-card, .panel {
+  --ah: 235;
+  --a: hsl(var(--ah) var(--acc-s) var(--acc-l));
+  --ban1: hsl(var(--ah) var(--ban-s) var(--ban-l1));
+  --ban2: hsl(calc(var(--ah) + 40) var(--ban-s) var(--ban-l2));
+  --pat: hsl(var(--ah) var(--pat-s) var(--pat-l) / var(--pat-a));
+}
+
+/* Paquet de cartes : toutes les cartes dans la même cellule, la position décide de l'inclinaison */
+.stage { display: grid; justify-items: center; padding: 1.5rem 1.25rem 2.5rem; overflow: hidden; touch-action: pan-y; }
+.acct-card {
+  grid-area: 1 / 1; width: min(34rem, 100%); min-width: 0; position: relative; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 1.25rem;
+  padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;
+  box-shadow: 0 22px 44px -24px rgb(0 0 0 / 0.5);
+  transform-origin: 50% 100%;
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.45s ease;
+}
+.acct-card > * { transition: opacity 0.3s ease; }
+.acct-card[data-pos="0"] { transform: rotate(1deg); z-index: 3; animation: bob 7s ease-in-out infinite; }
+.acct-card[data-pos="1"] { transform: translate(-1.25rem, 0.9rem) rotate(-2.5deg) scale(0.97); z-index: 2; opacity: 0.92; }
+.acct-card[data-pos="2"] { transform: translate(1.1rem, 1.6rem) rotate(4deg) scale(0.94); z-index: 1; opacity: 0.75; }
+.acct-card[data-pos="hide"] { transform: translate(0, 1.5rem) scale(0.9); opacity: 0; z-index: 0; pointer-events: none; }
+.acct-card[data-pos="hide"][data-exit="left"] { transform: translate(-112%, 0.5rem) rotate(-14deg); z-index: 4; }
+.acct-card:not([data-pos="0"]) > * { opacity: 0; }
+.acct-card[data-enter="next"] { animation: enter-next 0.55s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.acct-card[data-enter="prev"] { animation: enter-prev 0.55s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes enter-next { from { opacity: 0; transform: translate(3rem, 0.5rem) rotate(9deg) scale(0.91); } }
+@keyframes enter-prev { from { opacity: 0; transform: translate(-3rem, 0.5rem) rotate(-9deg) scale(0.91); } }
+@keyframes bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+
+/* Entrée en éventail, une seule fois quand le paquet arrive à l'écran */
+@keyframes deal { from { opacity: 0; transform: translate(0, 3rem) rotate(-9deg) scale(0.88); } }
+.stage.play .acct-card[data-pos="0"], .stage.play .acct-card[data-pos="1"], .stage.play .acct-card[data-pos="2"] {
+  animation: deal 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.stage.play .acct-card[data-pos="2"] { animation-delay: 0ms; }
+.stage.play .acct-card[data-pos="1"] { animation-delay: 140ms; }
+.stage.play .acct-card[data-pos="0"] { animation-delay: 280ms; }
+
+/* Lueur qui suit le pointeur */
+.acct-card::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.35s ease;
+  background: radial-gradient(18rem circle at var(--mx, 50%) var(--my, 30%), color-mix(in srgb, var(--a) 16%, transparent), transparent 70%);
+}
+.acct-card[data-pos="0"]:hover::before { opacity: 1; }
+
+/* Bannière propre à chaque compte (motif + dégradé, ou ton image) */
+.banner {
+  position: relative; overflow: hidden; height: 5.5rem; margin: -1.5rem -1.5rem 0;
+  background: linear-gradient(115deg, var(--ban1), var(--ban2));
+}
+.banner::before { content: ""; position: absolute; inset: 0; }
+.banner.p0::before { background: repeating-linear-gradient(135deg, var(--pat) 0 2px, transparent 2px 14px); }
+.banner.p1::before { background: radial-gradient(circle at 1px 1px, var(--pat) 1.6px, transparent 1.9px) 0 0 / 16px 16px; }
+.banner.p2::before { background: linear-gradient(var(--pat) 1px, transparent 1px) 0 0 / 22px 22px, linear-gradient(90deg, var(--pat) 1px, transparent 1px) 0 0 / 22px 22px; }
+.banner.p3::before { background: repeating-radial-gradient(circle at 85% 130%, transparent 0 14px, var(--pat) 14px 16px); }
+.banner.p4::before { background: repeating-linear-gradient(45deg, var(--pat) 0 1px, transparent 1px 12px), repeating-linear-gradient(-45deg, var(--pat) 0 1px, transparent 1px 12px); }
+.banner.p5::before { background: linear-gradient(135deg, var(--pat) 25%, transparent 25%) -10px 0 / 20px 20px, linear-gradient(225deg, var(--pat) 25%, transparent 25%) -10px 0 / 20px 20px; }
+.banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.banner::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-120%);
+  background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.28) 50%, transparent 65%);
+}
+.acct-card[data-pos="0"] .banner::after { animation: shine 6s ease-in-out 1.2s infinite; }
+@keyframes shine { 0% { transform: translateX(-120%); } 35%, 100% { transform: translateX(120%); } }
+.count {
+  position: absolute; top: 0.75rem; right: 0.75rem; z-index: 1; margin: 0;
+  font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase;
+  background: var(--surface); color: var(--fg); padding: 0.2rem 0.6rem; border-radius: 1rem; font-variant-numeric: tabular-nums;
+}
+.acct-top { display: flex; align-items: flex-end; gap: 1rem; min-width: 0; margin-top: -2.6rem; position: relative; z-index: 1; }
+.acct-top .mono-letter { border-radius: 0.9rem; background: var(--a); color: var(--on-acc); border: 4px solid var(--surface); width: 3.75rem; height: 3.75rem; }
+.acct-top h3 { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 2rem; line-height: 0.95; margin: 0 0 0.15rem; overflow-wrap: anywhere; }
+.acct-user { font-family: var(--font-mono); font-size: 1rem; margin: 0; overflow-wrap: anywhere; }
+.acct-desc { margin: 0; color: var(--muted); }
+.kv { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.kv .item { display: grid; gap: 0.15rem; border: 1px solid var(--line); background: var(--bg); border-radius: 0.75rem; padding: 0.55rem 0.75rem; max-width: 100%; min-width: 0; }
+.kv .lab { font-size: 0.75rem; color: var(--muted); }
+.kv .val { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; min-width: 0; }
+.kv code { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; overflow-wrap: anywhere; user-select: all; }
+.copy { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.2rem 0.5rem; border-color: var(--line); color: var(--muted); border-radius: 0.5rem; }
+.copy:hover { border-color: var(--accent); color: var(--accent); }
+.acct-card .btn { align-self: flex-start; border-radius: 0.75rem; padding: 0.7rem 1.1rem; }
+.acct-card .btn:hover { background: var(--a); color: var(--on-acc); }
+
+.deck-nav { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.75rem 1rem; }
+.deck-nav .arrow-btn { width: 2.75rem; height: 2.75rem; border-radius: 50%; font-family: var(--font-mono); font-size: 1.125rem; cursor: pointer; background: transparent; color: var(--fg); border: 1px solid var(--line); transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+.deck-nav .arrow-btn:hover { border-color: var(--accent); color: var(--accent); }
+.deck-nav .arrow-btn:active { transform: scale(0.92); }
+.dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; max-width: 22rem; }
+.dot-btn { position: relative; width: 0.6rem; height: 0.6rem; border-radius: 0.3rem; border: 0; padding: 0; background: var(--line); cursor: pointer; transition: width 0.3s ease, background 0.3s ease; }
+.dot-btn::after { content: ""; position: absolute; inset: -0.5rem -0.2rem; }
+.dot-btn[aria-current="true"] { width: 1.5rem; background: var(--accent); }
+.dots.auto .dot-btn[aria-current="true"] { background: var(--line); overflow: hidden; }
+.dots.auto .dot-btn[aria-current="true"]::before { content: ""; position: absolute; inset: 0; background: var(--accent); transform-origin: left; animation: fill var(--auto-ms, 6500ms) linear backwards; }
+@keyframes fill { from { transform: scaleX(0); } }
+
+/* Panneau sous le paquet : s'ouvre, se ferme et change avec la carte du dessus */
+.panel-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.55s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.panel-wrap.open { grid-template-rows: 1fr; }
+.panel-inner { overflow: hidden; min-height: 0; }
+.panel { margin-top: 2rem; background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--a); padding: 1.5rem; display: grid; gap: 1.5rem; transition: border-color 0.4s ease; }
+.panel > * { animation: rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(var(--k, 0) * 80ms); }
+.panel.still > *, .panel.still .tile::before { animation: none; }
+.panel-head { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem 1.5rem; }
+.panel-head .eyebrow { margin: 0 0 0.35rem; }
+.panel-head h3 { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(2rem, 6vw, 3rem); line-height: 0.95; margin: 0; color: var(--a); }
+.tags { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.tag { padding: 0.2rem 0.55rem; border: 1px dashed var(--warn); color: var(--warn); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 1rem; }
+.tile { position: relative; isolation: isolate; padding-top: 0.9rem; min-width: 0; animation: rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(var(--k, 0) * 90ms + 200ms); }
+.tile::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--a); transform-origin: left; animation: fill 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(var(--k, 0) * 90ms + 300ms); }
+.tile::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--line); z-index: -1; }
+.tile .l { display: block; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.tile .v { display: block; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.25rem, 9vw, 3.5rem); line-height: 1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.tile .v.txt { font-family: var(--font-body); font-weight: 700; font-size: 1.25rem; line-height: 1.25; padding-top: 0.25rem; }
+.panel .btn { justify-self: start; border-radius: 0.75rem; padding: 0.7rem 1.1rem; }
+.panel .btn:hover { background: var(--a); color: var(--on-acc); }
+
+footer { border-top: 1px solid var(--line); padding-top: 1.5rem; margin-top: 2.5rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-family: var(--font-mono); font-size: var(--fs-small); color: var(--muted); }
+
+/* Première vue : papier crème et contours dessinés à la main. */
+:root:not([data-theme="dark"]) {
+  --bg: #fffceb;
+  --surface: #fffceb;
+  --fg: #26231f;
+  --muted: #817c70;
+  --line: #d7d1c0;
+  --accent: #1477d4;
+  --accent-ink: #fffceb;
+  --ok: #0e8a4e;
+  --warn: #a8680b;
+  --bad: #c23a3a;
+  --off: #7b8691;
+  --acc-s: 74%;
+  --acc-l: 42%;
+  --on-acc: #fff;
+  --ban-s: 75%;
+  --ban-l1: 84%;
+  --ban-l2: 72%;
+  --pat-s: 80%;
+  --pat-l: 45%;
+  --pat-a: 0.35;
+  --font-display: "Caveat", cursive;
+  --font-body: "Patrick Hand", "Segoe Print", cursive;
+  --font-mono: "Patrick Hand", "Segoe Print", cursive;
+  color-scheme: light;
+}
+:root:not([data-theme="dark"]) body { background-image: none; }
+:root:not([data-theme="dark"]) .card,
+:root:not([data-theme="dark"]) .acct-card,
+:root:not([data-theme="dark"]) .panel { backdrop-filter: none; }
+body { background: var(--bg); }
+body::before { background: var(--bg); }
+main.wrap { max-width: 1280px; }
+.intro-frame {
+  position: relative;
+  min-height: min(690px, calc(100svh - 2rem));
+  margin: 1.5rem auto 0;
+  padding: 0 1.5rem 1.25rem;
+  border: 3px solid var(--fg);
+  border-radius: 2rem;
+  overflow: hidden;
+}
+.top {
+  position: relative;
+  top: auto;
+  margin-inline: -1.5rem;
+  padding-inline: 1.5rem;
+  background: transparent;
+  border-bottom: 3px solid var(--fg);
+}
+.top .wrap { max-width: none; padding-block: 0.55rem; }
+.mark {
+  color: var(--accent);
+  font-family: "Caveat", cursive;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.top nav { align-items: center; gap: 1rem; }
+.top nav a {
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.theme-toggle {
+  border: 2px solid var(--fg);
+  border-radius: 0.8rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.hero {
+  min-height: 540px;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  align-items: center;
+  gap: clamp(2rem, 7vw, 6rem);
+  padding: clamp(2rem, 5vw, 3.75rem) 0.25rem 2rem;
+}
+.hero-copy { max-width: 34rem; }
+.hero .eyebrow {
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--fg);
+}
+.hero .presence { font-size: 1rem; }
+.hero .presence .dot { width: 0.75rem; height: 0.75rem; }
+.hero h1 {
+  margin-bottom: 0.25rem;
+  font-family: "Caveat", cursive;
+  font-size: clamp(3.2rem, 7vw, 5.4rem);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 0.9;
+  text-transform: none;
+}
+.hero h1::before {
+  display: block;
+  content: "Salut, moi c’est";
+  font-size: 0.52em;
+  line-height: 1.1;
+}
+.hero .lead {
+  max-width: 19ch;
+  margin: 0 0 1.5rem;
+  font-family: "Caveat", cursive;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1.05;
+  font-weight: 500;
+}
+.hero .loop {
+  gap: 0.35rem;
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.loop span.step {
+  padding: 0;
+  border: 0;
+}
+.loop span.step:last-of-type {
+  color: var(--accent);
+  background: transparent;
+}
+.loop .arrow { color: var(--muted); }
+.loop .again { display: none; }
+.location-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  font-size: 1rem;
+}
+.location-tag::before {
+  width: 0.75rem;
+  height: 0.75rem;
+  content: "";
+  border: 2px solid var(--fg);
+  border-radius: 50%;
+  background: #91e6a8;
+}
+.hero-sheet {
+  width: min(16rem, 100%);
+  margin-top: 1.5rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--fg);
+  border-radius: 1.4rem;
+  background: var(--bg);
+}
+.hero-sheet h2 {
+  margin-bottom: 0.35rem;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.hero-sheet dl { gap: 0.25rem 0.75rem; }
+.hero-sheet dt, .hero-sheet dd { font-size: 0.95rem; }
+.hero-sheet dd { font-family: var(--font-body); }
+.hero-profile { min-width: 0; }
+.profile-heading { margin: 0 0 0.5rem 0.25rem; }
+.profile-heading .eyebrow {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.profile-heading p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+.stage {
+  min-height: 360px;
+  padding: 1rem 0.5rem 1.5rem;
+  overflow: visible;
+}
+.acct-card {
+  width: min(20rem, 100%);
+  padding: 1rem;
+  gap: 0.65rem;
+  border: 3px solid var(--fg);
+  border-radius: 1.5rem;
+  background: var(--bg);
+  box-shadow: none;
+}
+.acct-card[data-pos="0"] { transform: rotate(0.5deg); }
+.acct-card[data-pos="1"] { transform: translate(-1rem, 0.8rem) rotate(-2deg) scale(0.97); }
+.acct-card[data-pos="2"] { transform: translate(0.8rem, 1.35rem) rotate(3deg) scale(0.94); }
+.banner {
+  height: 5.25rem;
+  margin: -1rem -1rem 0;
+  background: transparent;
+}
+.banner::before { opacity: 0.16; }
+.banner::after, .count { display: none; }
+.acct-top {
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0;
+}
+.acct-top .mono-letter { display: none; }
+.acct-top h3 {
+  font-family: "Caveat", cursive;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-transform: none;
+}
+.acct-user {
+  font-family: "Caveat", cursive;
+  font-size: 1.75rem;
+}
+.acct-desc { color: var(--muted); font-size: 1rem; }
+.kv .item {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.kv .lab { display: none; }
+.kv code { font-size: 1rem; }
+.copy { display: none; }
+.acct-card .btn {
+  padding: 0;
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+.acct-card .btn:hover { color: var(--accent); background: transparent; }
+.deck-nav { flex-wrap: nowrap; gap: 0.75rem; }
+.deck-nav .arrow-btn {
+  width: 3.4rem;
+  height: 3.4rem;
+  border: 3px solid var(--fg);
+  color: var(--fg);
+  font-size: 1.5rem;
+  flex: none;
+}
+.dots { flex-wrap: nowrap; gap: 0.35rem; max-width: none; }
+.dot-btn {
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 2px solid var(--fg);
+  border-radius: 50%;
+  background: transparent;
+  flex: none;
+}
+.dot-btn[aria-current="true"] { width: 0.55rem; background: var(--fg); }
+.dots.auto .dot-btn[aria-current="true"] { background: var(--fg); }
+.dots.auto .dot-btn[aria-current="true"]::before { display: none; }
+.block { padding-block: clamp(2rem, 5vw, 3.5rem); }
+.head h2 { font-family: "Caveat", cursive; text-transform: none; }
+.card, .acct-card, .panel { background-color: var(--surface); }
+
+@media (max-width: 760px) {
+  .intro-frame {
+    min-height: 0;
+    margin-top: 0.75rem;
+    padding-inline: 1rem;
+    border-radius: 1.5rem;
+  }
+  .top { margin-inline: -1rem; padding-inline: 1rem; }
+  .top .wrap { align-items: flex-start; }
+  .top nav { gap: 0.55rem; }
+  .top nav a { font-size: 1rem; }
+  .theme-toggle { padding: 0.25rem 0.45rem; }
+  .hero {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    padding-block: 2rem 1rem;
+  }
+  .hero-copy { max-width: none; }
+  .hero h1 { font-size: clamp(3.5rem, 14vw, 5rem); }
+  .hero .lead { font-size: clamp(2rem, 8vw, 2.6rem); }
+  .location-tag { margin-top: 1rem; }
+  .hero-sheet { display: none; }
+  .hero-profile { width: 100%; }
+  .stage { min-height: 320px; }
+  .acct-card { width: min(20rem, 88vw); }
+  .deck-nav .arrow-btn { width: 2.8rem; height: 2.8rem; }
+  .dots { max-width: none; gap: 0.25rem; }
+  .dot-btn, .dot-btn[aria-current="true"] { width: 0.45rem; height: 0.45rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<main class="wrap" id="haut">
+  <div class="intro-frame">
+    <header class="top">
+      <div class="wrap">
+        <a class="mark" href="#haut">Begy02300.</a>
+        <nav aria-label="Sections">
+          <a href="#jeux">Jeux</a>
+          <a href="#comptes">Comptes</a>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Basculer le thème">Mode sombre</button>
+        </nav>
+      </div>
+    </header>
+
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">
+          <span class="presence" id="presence" data-state="off" aria-live="polite">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="txt" id="presence-text">Connexion au statut…</span>
+          </span>
+        </p>
+        <h1 id="name"></h1>
+        <p class="lead" id="bio"></p>
+        <div class="loop" aria-label="La boucle : créer, tester, recommencer">
+          
+        </div>
+        <span class="location-tag" id="loc"></span>
+        <aside class="card hero-sheet" aria-label="Fiche du joueur">
+          <h2>En bref</h2>
+          <dl id="sheet"></dl>
+        </aside>
+      </div>
+      <aside class="hero-profile" aria-label="Mes profils en ligne">
+        <div class="profile-heading">
+          <p class="eyebrow">Mes profils</p>
+          <p>Retrouve-moi sur le web.</p>
+        </div>
+        <div class="stage" id="stage" tabindex="0" role="region" aria-roledescription="carrousel" aria-label="Mes comptes, flèches gauche et droite pour changer de carte"></div>
+        <div class="deck-nav">
+          <button type="button" class="arrow-btn" id="d-prev" aria-label="Compte précédent">←</button>
+          <div class="dots" id="dots"></div>
+          <button type="button" class="arrow-btn" id="d-next" aria-label="Compte suivant">→</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <section class="block" id="jeux" aria-labelledby="jeux-titre">
+    <div class="head">
+      <div>
+        <h2 id="jeux-titre">Mes plateformes</h2>
+        <p>Les comptes sur lesquels je joue. Un clic ouvre le profil.</p>
+      </div>
+      <div class="ctrl">
+        <button type="button" id="prev" aria-label="Plateformes précédentes">←</button>
+        <button type="button" id="next" aria-label="Plateformes suivantes">→</button>
+      </div>
+    </div>
+    <div class="track" id="track" tabindex="0" role="region" aria-label="Carrousel des plateformes de jeu"></div>
+  </section>
+
+  <section class="block" id="comptes" aria-labelledby="comptes-titre">
+    <div class="head">
+      <div>
+        <p class="eyebrow">On se retrouve ?</p>
+        <h2 id="comptes-titre">Mes comptes<span class="pt">.</span></h2>
+      </div>
+    </div>
+    <div class="panel-wrap" id="panel-wrap" aria-hidden="true">
+      <div class="panel-inner">
+        <section class="panel" id="panel" aria-live="polite" aria-label="Détails du compte affiché" inert></section>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span id="foot-name"></span>
+    <span>Je crée, je teste, je recommence.</span>
+  </footer>
+</main>
+
+<script src="./profile.js"></script>
+<script src="./assets/js/api-loader.js"></script>
+<script type="module">
+import { initializePortfolioApis } from "./api/index.js";
+
+await initializePortfolioApis(window.PORTFOLIO_CONFIG);
+
+(function () {
+  /* ---------- Réglages ---------- */
+  var CONFIG = {
+    displayName: "Auguste",
+    bio: "Je crée, je teste, je recommence.",
+    location: "France",
+    githubUsername: "BEGY02300",
+
+    /* Statut en direct : ton ID Discord (le service Lanyard doit te suivre). */
+    discordId: "1125783712316002424",
+    /* Mets false pour n'afficher que le nom de l'appli (ex. Visual Studio Code) sans le fichier ni le projet. */
+    showActivityDetails: true,
+    /* Les cartes défilent seules tant que personne n'y touche (en millisecondes, 0 pour couper). */
+    autoplayMs: 6500,
+
+    /* Jeux à la main : ajoute des noms entre guillemets, séparés par des virgules. */
+    gamingPlatforms: [
+      { name: "Steam", accountName: "BEGY02300", url: "https://steamcommunity.com/profiles/76561198612871711/", provider: "steam", gamesFile: "./games/steam/games.json", games: [] },
+      { name: "PlayStation", accountName: "BEGY02300", url: "https://www.playstation.com/en-us/profile/BEGY02300/", provider: "playstation", games: [] },
+      { name: "Xbox", accountName: "", games: [] },
+      { name: "Epic Games", accountName: "Begy02300", url: "https://www.epicgames.com/id/", games: [] },
+      { name: "Ubisoft Connect", accountName: "BEGY02300", url: "https://www.ubisoft.com/en-us/profile/BEGY02300", games: [] },
+      { name: "EA", accountName: "BEGY02300", url: "https://profile.ea.com/BEGY02300", games: [] },
+      { name: "Roblox", accountName: "BEGY504", url: "https://www.roblox.com/fr/users/6136427497/profile", provider: "roblox", games: [] }
+    ],
+
+    /* Chaque compte : hue = sa couleur (0 à 360), image = ta propre bannière (chemin ou data:) si tu en veux une,
+       stats = les chiffres du panneau sous le paquet. Mets example: false quand ce sont tes vrais chiffres. */
+    accounts: [
+      { name: "GitHub", hue: 265, username: "BEGY02300", url: "https://github.com/BEGY02300", description: "Mes dépôts publics.", image: "https://github.com/BEGY02300.png", details: [["Identifiant", "BEGY02300"]] },
+      { name: "Discord", hue: 235, live: "discord", username: "begy02300", url: "https://discord.com/users/1125783712316002424", description: "Me retrouver et discuter.", details: [["Identifiant", "begy02300"], ["ID du compte", "1125783712316002424"]] },
+      { name: "Instagram", hue: 330, username: "BEGY02300", url: "https://www.instagram.com/auguste_begy02300/", description: "Mon compte Instagram.", details: [["Identifiant", "BEGY02300"]] },
+      { name: "Patreon", hue: 8, username: "Begy02300", url: "https://www.patreon.com/c/Begy02300", description: "Mon compte Patreon.", details: [["Identifiant", "Begy02300"]] },
+      { name: "GitLab", hue: 18, username: "BEGY02", url: "https://gitlab.com/begy02", description: "Mes projets sur GitLab.", details: [["Identifiant", "BEGY02"]] },
+      { name: "Replit", hue: 175, username: "BEGY02", url: "https://replit.com/@BEGY02", description: "Mes essais et prototypes en ligne.", details: [["Identifiant", "BEGY02"]] },
+      { name: "Roblox", hue: 350, live: "roblox", username: "BEGY504", url: "https://www.roblox.com/fr/users/6136427497/profile", description: "Mon profil Roblox.", details: [["Identifiant", "BEGY504"], ["ID du compte", "6136427497"]] },
+      { name: "PlayStation", hue: 215, username: "BEGY02300", url: "https://www.playstation.com/en-us/profile/BEGY02300/", description: "Mon compte PlayStation.", details: [["ID en ligne", "BEGY02300"]] },
+      { name: "Steam", hue: 195, username: "BEGY02300", url: "https://steamcommunity.com/profiles/76561198612871711/", description: "Mon profil Steam.", details: [["Identifiant", "BEGY02300"], ["ID du compte", "76561198612871711"]] },
+      { name: "Rockstar", hue: 45, username: "BEGY_v", url: "https://socialclub.rockstargames.com/member/Begy_v/games", description: "Mon compte Rockstar.", details: [["Identifiant", "BEGY_v"]] },
+      { name: "Ubisoft", hue: 250, username: "BEGY02300", url: "https://www.ubisoft.com/en-us/profile/BEGY02300", description: "Mon compte Ubisoft.", details: [["Identifiant", "BEGY02300"]] },
+      { name: "Electronic Arts", hue: 120, username: "BEGY02300", url: "https://profile.ea.com/BEGY02300", description: "Mon compte Electronic Arts.", details: [["Identifiant", "BEGY02300"]] },
+      { name: "BF6 Tracker", hue: 30, username: "BEGY02300", url: "https://tracker.gg/bf6/profile/1014659847596/overview", description: "Mes statistiques sur Battlefield 6.", details: [["Identifiant", "BEGY02300"], ["ID du compte", "1014659847596"]],
+        stats: { example: true, updated: "", cta: "Voir toutes mes stats", items: [{ label: "K/D", value: 1.15, decimals: 2 }, { label: "Victoires", value: 64 }, { label: "Temps de jeu", value: 85, suffix: " h" }] } },
+      { name: "Fortnite Tracker", hue: 285, username: "Begy02300", url: "https://fortnitetracker.com/fortnite/profile/epic/Begy02300/matchmaking/overview", description: "Mes statistiques sur Fortnite.", details: [["Identifiant", "Begy02300"]],
+        stats: { example: true, updated: "", cta: "Voir toutes mes stats", items: [{ label: "K/D", value: 0.92, decimals: 2 }, { label: "Victoires", value: 12 }, { label: "Parties", value: 240 }] } },
+      { name: "R6 Mobile Tracker", hue: 160, username: "Begy02300", url: "https://tracker.gg/r6mobile/profile/ign/76fd10e3-bd00-464e-a5fd-05f07f16cbfa/overview", description: "Mes statistiques sur Rainbow Six Mobile.", details: [["Identifiant", "Begy02300"], ["ID du compte", "76fd10e3-bd00-464e-a5fd-05f07f16cbfa"]],
+        stats: { example: true, updated: "", cta: "Voir toutes mes stats", items: [{ label: "K/D", value: 1.42, decimals: 2 }, { label: "Victoires", value: 128 }, { label: "Parties", value: 312 }, { label: "Taux de victoire", value: 41, suffix: " %" }] } }
+    ]
+  };
+
+  var profileConfig = window.PORTFOLIO_CONFIG || {};
+  (profileConfig.gamingPlatforms || []).forEach(function (savedPlatform) {
+    var platform = CONFIG.gamingPlatforms.filter(function (item) {
+      return item.name === savedPlatform.name;
+    })[0];
+    if (!platform) return;
+    platform.accountName = savedPlatform.accountName || platform.accountName;
+    platform.url = savedPlatform.url || platform.url;
+    platform.gamesFile = savedPlatform.gamesFile || platform.gamesFile;
+    platform.games = Array.isArray(savedPlatform.games) ? savedPlatform.games : platform.games;
+    platform.notice = savedPlatform.notice || "";
+  });
+
+  CONFIG.accounts.forEach(function (account) {
+    var social = (profileConfig.socials || []).filter(function (item) {
+      return item.name.toLowerCase() === account.name.toLowerCase();
+    })[0];
+    if (!social) return;
+    account.username = social.username || account.username;
+    account.url = social.url || account.url;
+    account.image = social.avatarUrl || account.image;
+    if (social.profile && social.profile.description) {
+      account.description = social.profile.description;
+    } else if (social.description) {
+      account.description = social.description;
+    }
+    if (Array.isArray(social.details) && social.details.length) {
+      account.details = social.details.map(function (detail) {
+        return Array.isArray(detail) ? detail : [detail.label, detail.value];
+      });
+    }
+  });
+
+  var liveFortniteStats = profileConfig.trackerStats &&
+    profileConfig.trackerStats.fortnite;
+  if (Array.isArray(liveFortniteStats)) {
+    var fortniteAccount = CONFIG.accounts.filter(function (account) {
+      return account.name === "Fortnite Tracker";
+    })[0];
+    if (fortniteAccount) {
+      fortniteAccount.stats = {
+        example: false,
+        updated: new Date().toISOString(),
+        cta: "Voir toutes mes stats",
+        items: liveFortniteStats
+      };
+    }
+  }
+
+  /* ---------- Outils ---------- */
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    attrs = attrs || {};
+    Object.keys(attrs).forEach(function (k) {
+      if (k === "text") el.textContent = attrs[k];
+      else if (k === "class") el.className = attrs[k];
+      else el.setAttribute(k, attrs[k]);
+    });
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null) continue;
+      el.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    }
+    return el;
+  }
+  var $ = function (id) { return document.getElementById(id); };
+  var pad = function (n) { return n < 10 ? "0" + n : String(n); };
+  var reduceMotion = function () { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; };
+  var fr = function (n, dec) { return n.toLocaleString("fr-FR", { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 }); };
+  var themeButton = $("theme-toggle");
+  function isDarkTheme() {
+    return document.documentElement.getAttribute("data-theme") === "dark";
+  }
+  function syncThemeButton() {
+    themeButton.textContent = isDarkTheme() ? "Mode clair" : "Mode sombre";
+    themeButton.setAttribute("aria-pressed", isDarkTheme() ? "true" : "false");
+  }
+  themeButton.addEventListener("click", function () {
+    document.documentElement.setAttribute("data-theme", isDarkTheme() ? "light" : "dark");
+    syncThemeButton();
+  });
+  syncThemeButton();
+
+  var lastPresence = null;
+  var panelReady = false;
+  var robloxActivity = { status: "idle", data: null, message: "" };
+
+  /* ---------- Hero ---------- */
+  $("loc").textContent = CONFIG.location;
+  $("name").textContent = CONFIG.displayName;
+  $("bio").textContent = CONFIG.bio;
+  $("foot-name").textContent = "© 2026 " + CONFIG.displayName;
+  var sheet = $("sheet");
+  [
+    ["Pseudo", CONFIG.githubUsername],
+    ["Lieu", CONFIG.location],
+    ["Plateformes", String(CONFIG.gamingPlatforms.length)],
+    ["Comptes", String(CONFIG.accounts.length)]
+  ].forEach(function (p) {
+    sheet.appendChild(h("dt", { text: p[0] }));
+    sheet.appendChild(h("dd", { text: p[1] }));
+  });
+
+  /* ---------- Statut Discord en direct (Lanyard) ---------- */
+  var presenceEl = $("presence"), presenceText = $("presence-text");
+  var STATUS = {
+    online: ["ok", "En ligne"],
+    idle: ["warn", "Absent"],
+    dnd: ["bad", "Ne pas déranger"],
+    offline: ["off", "Hors ligne"]
+  };
+
+  function describe(data) {
+    var st = STATUS[data.discord_status] || STATUS.offline;
+    var acts = data.activities || [];
+    var byType = function (t) { return acts.filter(function (a) { return a.type === t; })[0]; };
+    var main = st[1], sub = "", doing = false;
+    var playing = byType(0), live = byType(1), listening = byType(2), custom = byType(4);
+    if (playing) {
+      doing = true;
+      main = playing.name;
+      if (CONFIG.showActivityDetails) sub = [playing.details, playing.state].filter(Boolean).join(" · ");
+    } else if (live) {
+      doing = true;
+      main = "En direct : " + live.name;
+      sub = live.details || "";
+    } else if (listening) {
+      doing = true;
+      main = "Écoute " + (listening.details || listening.name);
+      sub = listening.state ? listening.state.replace(/;\s*/g, ", ") : "";
+    } else if (custom && (custom.state || custom.emoji)) {
+      sub = ((custom.emoji && custom.emoji.name) ? custom.emoji.name + " " : "") + (custom.state || "");
+    }
+    return { state: st[0], label: st[1], main: main, sub: sub.trim(), doing: doing };
+  }
+
+  function renderPresence(data) {
+    lastPresence = data;
+    var d = describe(data);
+    presenceEl.setAttribute("data-state", d.state);
+    presenceEl.title = d.label;
+    presenceText.textContent = "";
+    presenceText.appendChild(h("span", { class: "main", text: d.main }));
+    if (d.sub) presenceText.appendChild(h("span", { class: "sub", text: " · " + d.sub }));
+    refreshLive();
+  }
+  function presenceUnavailable() {
+    presenceEl.setAttribute("data-state", "off");
+    presenceEl.title = "";
+    presenceText.textContent = "Statut indisponible";
+  }
+
+  var API = "https://api.lanyard.rocks/v1/users/" + CONFIG.discordId;
+  var SOCKET = "wss://api.lanyard.rocks/socket";
+  var socketOpen = false, everOpened = false, socketTries = 0, pollFails = 0, gotData = false;
+
+  function poll() {
+    fetch(API).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.success && j.data) { gotData = true; pollFails = 0; renderPresence(j.data); }
+      else { pollFails++; if (!gotData) presenceUnavailable(); }
+    }).catch(function () { pollFails++; if (!gotData) presenceUnavailable(); });
+  }
+
+  function connect() {
+    var ws, beat;
+    try { ws = new WebSocket(SOCKET); } catch (e) { return; }
+    ws.onopen = function () { socketOpen = true; everOpened = true; socketTries = 0; };
+    ws.onmessage = function (ev) {
+      var m;
+      try { m = JSON.parse(ev.data); } catch (e) { return; }
+      if (m.op === 1) {
+        ws.send(JSON.stringify({ op: 2, d: { subscribe_to_id: CONFIG.discordId } }));
+        clearInterval(beat);
+        beat = setInterval(function () { try { ws.send(JSON.stringify({ op: 3 })); } catch (e) {} }, m.d.heartbeat_interval);
+      } else if (m.op === 0 && (m.t === "INIT_STATE" || m.t === "PRESENCE_UPDATE")) {
+        var d = (m.d && m.d[CONFIG.discordId]) ? m.d[CONFIG.discordId] : m.d;
+        if (d && d.discord_status) { gotData = true; renderPresence(d); }
+      }
+    };
+    ws.onclose = function () {
+      socketOpen = false;
+      clearInterval(beat);
+      socketTries++;
+      if (!everOpened && socketTries >= 3) return;
+      setTimeout(connect, Math.min(30000, 2000 * Math.pow(2, Math.min(socketTries, 4))));
+    };
+  }
+
+  function safeExternalUrl(value) {
+    try {
+      var url = new URL(value);
+      return url.protocol === "https:" ? url.href : "";
+    } catch (e) {
+      return "";
+    }
+  }
+  function formatMinutes(minutes) {
+    if (!Number.isFinite(minutes) || minutes < 0) return "";
+    return minutes >= 60 ? fr(minutes / 60, 1) + " h" : fr(minutes) + " min";
+  }
+  function formatDate(value) {
+    var date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("fr-FR");
+  }
+  function activityErrorMessage(error) {
+    var message = error && error.message ? error.message : "";
+    if (/failed to fetch|load failed|networkerror/i.test(message)) {
+      return "API indisponible : ouvre cette page sur Cloudflare Pages ou avec Wrangler.";
+    }
+    return message || "Impossible de charger l’activité.";
+  }
+  function appendGameGroup(container, title, games, platform, recent) {
+    if (!games.length) return;
+    container.appendChild(h("p", { class: "activity-heading", text: title }));
+    var list = h("ul", { class: "activity-list" });
+    games.slice(0, 3).forEach(function (game) {
+      var gameUrl = safeExternalUrl(game.url);
+      var name = gameUrl
+        ? h("a", { class: "activity-game-name", href: gameUrl, target: "_blank", rel: "noopener noreferrer", text: game.name })
+        : h("span", { class: "activity-game-name", text: game.name });
+      var details = [];
+      if (platform.provider === "steam" && recent && game.recentPlaytimeMinutes > 0) {
+        details.push(formatMinutes(game.recentPlaytimeMinutes) + " / 14 j");
+      }
+      if (game.playtimeMinutes > 0) details.push(formatMinutes(game.playtimeMinutes) + " au total");
+      if (platform.provider === "playstation" && game.lastPlayedAt) {
+        details.push(formatDate(game.lastPlayedAt));
+      }
+      list.appendChild(h("li", {}, name, h("span", {
+        class: "activity-game-meta",
+        text: details.join(" · ")
+      })));
+    });
+    container.appendChild(list);
+  }
+  function renderPlatformActivity(platform, slot, data) {
+    slot.textContent = "";
+    var summary = h("div", { class: "activity-summary" });
+    if (platform.provider === "roblox") {
+      var profile = data.profile;
+      if (profile) {
+        summary.appendChild(h("img", {
+          class: "activity-avatar",
+          src: profile.avatarUrl,
+          alt: "Avatar de " + profile.displayName,
+          loading: "lazy"
+        }));
+        summary.appendChild(h("p", {
+          class: "activity-heading",
+          text: profile.displayName + " · profil public Roblox"
+        }));
+        if (profile.description) {
+          summary.appendChild(h("p", { class: "activity-message", text: profile.description }));
+        }
+        if (profile.created) {
+          summary.appendChild(h("p", {
+            class: "activity-note",
+            text: "Compte créé le " + formatDate(profile.created)
+          }));
+        }
+      } else {
+        summary.appendChild(h("p", {
+          class: "activity-message",
+          text: "Profil public Roblox indisponible ; le lien du compte reste accessible."
+        }));
+      }
+    } else {
+      var recentGames = Array.isArray(data.recentGames) ? data.recentGames : [];
+      var topGames = Array.isArray(data.topPlayedGames) ? data.topPlayedGames : [];
+      appendGameGroup(
+        summary,
+        platform.provider === "steam" ? "Joués ces 14 derniers jours" : "Derniers jeux joués",
+        recentGames,
+        platform,
+        true
+      );
+      appendGameGroup(summary, "Top 3 · temps total", topGames, platform, false);
+      if (Array.isArray(data.games) && data.games.length) {
+        var details = h("details", { class: "activity-details" });
+        details.appendChild(h("summary", {
+          text: "Bibliothèque complète · " + fr(data.totalGames || data.games.length) + " jeux"
+        }));
+        details.addEventListener("toggle", function () {
+          if (!details.open || details.getAttribute("data-loaded")) return;
+          var list = h("ul", { class: "games", "aria-label": "Bibliothèque " + platform.name });
+          data.games.forEach(function (game) {
+            var label = game.name;
+            if (game.playtimeMinutes > 0) label += " · " + formatMinutes(game.playtimeMinutes);
+            list.appendChild(h("li", { text: label }));
+          });
+          details.appendChild(list);
+          details.setAttribute("data-loaded", "true");
+        });
+        summary.appendChild(details);
+      }
+    }
+    if (data.activityNote) summary.appendChild(h("p", { class: "activity-note", text: data.activityNote }));
+    slot.appendChild(summary);
+  }
+  function loadPlatformActivity(platform, slot) {
+    if (platform.provider === "roblox") {
+      var robloxProfile = window.PORTFOLIO_API_DATA &&
+        window.PORTFOLIO_API_DATA.roblox;
+      renderPlatformActivity(platform, slot, { profile: robloxProfile });
+      return;
+    }
+
+    if (platform.provider === "steam") {
+      var loadedSteamData = window.PORTFOLIO_API_DATA &&
+        window.PORTFOLIO_API_DATA.steam;
+      if (loadedSteamData) {
+        if (loadedSteamData.activityNote) {
+          loadedSteamData.activityNote =
+            loadedSteamData.activityNote +
+            (loadedSteamData.cache === "stale-session"
+              ? " (cache de session)"
+              : "");
+        }
+        renderPlatformActivity(platform, slot, loadedSteamData);
+        return;
+      }
+
+      var configuredPlatforms = window.PORTFOLIO_CONFIG &&
+        window.PORTFOLIO_CONFIG.gamingPlatforms;
+      var configuredSteam = Array.isArray(configuredPlatforms)
+        ? configuredPlatforms.filter(function (item) { return item.id === "steam"; })[0]
+        : null;
+      var fallbackPlatform = {
+        games: configuredSteam && Array.isArray(configuredSteam.games)
+          ? configuredSteam.games
+          : platform.games,
+        gamesFile: configuredSteam && configuredSteam.gamesFile
+          ? configuredSteam.gamesFile
+          : platform.gamesFile
+      };
+
+      window.PortfolioApiLoader.loadSteamLibrary(fallbackPlatform)
+        .then(function (result) {
+          var games = result.data.games.map(function (game) { return game.name; });
+          platform.games = games;
+
+          if (configuredSteam) configuredSteam.games = games.slice();
+
+          if (result.message) result.data.activityNote = result.message;
+          renderPlatformActivity(platform, slot, result.data);
+        })
+        .catch(function (error) {
+          console.error("Chargement de la bibliothèque Steam impossible.", error);
+          slot.textContent = "";
+          slot.appendChild(h("p", {
+            class: "activity-message",
+            text: "Données Steam indisponibles ; la liste locale est conservée."
+          }));
+        });
+      return;
+    }
+
+    slot.textContent = "";
+    slot.appendChild(h("p", {
+      class: "activity-note",
+      text: platform.notice || "Aucune API publique configurée ; les données et le lien restent manuels."
+    }));
+  }
+
+  /* ---------- Plateformes de jeu ---------- */
+  var track = $("track");
+  CONFIG.gamingPlatforms.forEach(function (p) {
+    var linked = !!(p.url && p.accountName);
+    var foot = h("div", { class: "foot" });
+    if (p.games.length) {
+      var list = h("ul", { class: "games", "aria-label": "Jeux " + p.name });
+      p.games.forEach(function (g) { list.appendChild(h("li", { text: g })); });
+      foot.appendChild(list);
+    } else if (linked) {
+      foot.appendChild(h("p", { class: "note", text: "Liste de jeux à venir." }));
+    } else {
+      foot.appendChild(h("p", { class: "note", text: "Aucun compte renseigné pour le moment." }));
+    }
+    if (p.provider) {
+      var activity = h("div", { class: "activity-summary", "aria-live": "polite" },
+        h("p", { class: "activity-message", text: "Chargement de l’activité…" })
+      );
+      foot.appendChild(activity);
+      loadPlatformActivity(p, activity);
+    }
+    if (linked) foot.appendChild(h("a", { class: "btn", href: p.url, target: "_blank", rel: "noopener noreferrer", text: "Voir le profil ↗" }));
+    track.appendChild(
+      h("article", { class: "card plat" + (linked ? "" : " off") },
+        h("div", { class: "mono-letter", "aria-hidden": "true", text: p.name.charAt(0) }),
+        h("div", {}, h("h3", { text: p.name }), h("p", { class: "acct", text: p.accountName || "—" })),
+        h("span", { class: "badge", text: linked ? "Compte lié" : "À venir" }),
+        foot
+      )
+    );
+  });
+  var prev = $("prev"), next = $("next");
+  function syncTrack() {
+    var max = track.scrollWidth - track.clientWidth - 2;
+    prev.disabled = track.scrollLeft <= 2;
+    next.disabled = track.scrollLeft >= max;
+  }
+  function stepTrack(dir) {
+    var card = track.querySelector(".plat");
+    var w = card ? card.getBoundingClientRect().width + 16 : 300;
+    track.scrollBy({ left: dir * w, behavior: reduceMotion() ? "auto" : "smooth" });
+  }
+  prev.addEventListener("click", function () { stepTrack(-1); });
+  next.addEventListener("click", function () { stepTrack(1); });
+  track.addEventListener("scroll", syncTrack, { passive: true });
+  window.addEventListener("resize", syncTrack);
+  syncTrack();
+
+  /* ---------- Paquet de comptes ---------- */
+  var stage = $("stage"), dotsEl = $("dots");
+  var accounts = CONFIG.accounts, total = accounts.length, active = 0;
+  var cards = [], dots = [];
+
+  function flash(btn, msg) {
+    var old = btn.getAttribute("data-label");
+    btn.textContent = msg;
+    setTimeout(function () { btn.textContent = old; }, 1400);
+  }
+  function copyValue(btn, codeEl) {
+    function fallback() {
+      try {
+        var r = document.createRange();
+        r.selectNodeContents(codeEl);
+        var s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(r);
+        flash(btn, "Sélectionné");
+      } catch (e) { flash(btn, "Copie impossible"); }
+    }
+    try {
+      navigator.clipboard.writeText(codeEl.textContent).then(function () { flash(btn, "Copié ✓"); }, fallback);
+    } catch (e) { fallback(); }
+  }
+
+  accounts.forEach(function (a, i) {
+    var kv = h("div", { class: "kv" });
+    a.details.forEach(function (d) {
+      var code = h("code", { text: d[1] });
+      var btn = h("button", { class: "copy", type: "button", "data-label": "Copier", "aria-label": "Copier " + d[0].toLowerCase() + " " + a.name, text: "Copier" });
+      btn.addEventListener("click", function () { copyValue(btn, code); });
+      kv.appendChild(h("div", { class: "item" }, h("span", { class: "lab", text: d[0] }), h("span", { class: "val" }, code, btn)));
+    });
+    var banner = h("div", { class: "banner p" + (i % 6), "aria-hidden": "true" });
+    if (a.image) banner.appendChild(h("img", { src: a.image, alt: "", loading: "lazy" }));
+    banner.appendChild(h("p", { class: "count", text: "Compte " + pad(i + 1) + " / " + pad(total) }));
+    var card = h("article", { class: "acct-card", "aria-label": a.name + ", compte " + (i + 1) + " sur " + total },
+      banner,
+      h("div", { class: "acct-top" },
+        h("div", { class: "mono-letter", "aria-hidden": "true", text: a.name.charAt(0) }),
+        h("h3", { text: a.name })
+      ),
+      h("p", { class: "acct-user", text: "@" + a.username }),
+      h("p", { class: "acct-desc", text: a.description }),
+      kv,
+      h("a", { class: "btn", href: a.url, target: "_blank", rel: "noopener noreferrer", text: "Ouvrir mon profil ↗" })
+    );
+    card.style.setProperty("--ah", a.hue);
+    cards.push(card);
+    stage.appendChild(card);
+
+    var dot = h("button", { class: "dot-btn", type: "button", "aria-label": "Compte " + (i + 1) + " : " + a.name });
+    dot.addEventListener("click", function () { userAction(); go(i); });
+    dots.push(dot);
+    dotsEl.appendChild(dot);
+  });
+
+  /* ---------- Panneau de stats ---------- */
+  var wrap = $("panel-wrap"), panel = $("panel");
+
+  function countUp(el, to, dec, suffix) {
+    var fmt = function (n) { return fr(n, dec) + (suffix || ""); };
+    el.textContent = fmt(to);
+    if (reduceMotion()) return;
+    var t0 = null, dur = 1000;
+    requestAnimationFrame(function step(ts) {
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      el.textContent = fmt(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    });
+  }
+
+  function liveItems() {
+    if (!lastPresence) return [{ label: "Statut", value: "Indisponible" }];
+    var d = describe(lastPresence);
+    var items = [{ label: "Statut", value: d.label }];
+    if (d.doing) items.push({ label: "En ce moment", value: d.main });
+    if (d.sub) items.push({ label: d.doing ? "Détail" : "Message", value: d.sub });
+    return items;
+  }
+
+  function loadRobloxActivity() {
+    if (robloxActivity.status !== "idle") return;
+    var profile = window.PORTFOLIO_API_DATA &&
+      window.PORTFOLIO_API_DATA.roblox;
+    robloxActivity = profile
+      ? { status: "loaded", data: profile, message: "" }
+      : {
+          status: "error",
+          data: null,
+          message: "Profil public Roblox indisponible ; les informations manuelles restent affichées."
+        };
+  }
+
+  function robloxItems(data) {
+    var profile = data.profile || data;
+    var items = [
+      { label: "Identifiant", value: profile.username || "Indisponible" },
+      { label: "Nom affiché", value: profile.displayName || "Indisponible" },
+      { label: "Compte créé", value: formatDate(profile.created) || "Indisponible" }
+    ];
+    if (profile.hasVerifiedBadge) items.push({ label: "Compte", value: "Vérifié" });
+    return items;
+  }
+
+  function buildPanel(animate) {
+    if (!panelReady) return;
+    var a = accounts[active], items = null, eyebrow = "", example = false, updated = "", cta = "Voir le profil", note = "";
+    if (a.live === "discord") { eyebrow = "En direct · " + a.name; items = liveItems(); cta = "Ouvrir mon profil"; }
+    else if (a.live === "roblox") {
+      eyebrow = "Données publiques · " + a.name;
+      cta = "Ouvrir mon profil";
+      if (robloxActivity.status === "idle") loadRobloxActivity();
+      if (robloxActivity.status === "loaded") {
+        items = robloxItems(robloxActivity.data);
+        updated = formatDate(robloxActivity.data.updatedAt);
+        note = robloxActivity.data.activityNote;
+      } else if (robloxActivity.status === "error") {
+        items = [{ label: "Statut", value: "Indisponible" }];
+        note = robloxActivity.message;
+      } else {
+        items = [{ label: "Profil", value: "Chargement…" }];
+      }
+    }
+    else if (a.stats) { eyebrow = "Stats · " + a.name; items = a.stats.items; example = !!a.stats.example; updated = a.stats.updated || ""; cta = a.stats.cta || cta; }
+    if (!items) {
+      wrap.classList.remove("open");
+      wrap.setAttribute("aria-hidden", "true");
+      panel.setAttribute("inert", "");
+      return;
+    }
+    panel.style.setProperty("--ah", a.hue);
+    panel.className = "panel" + (animate ? "" : " still");
+    panel.textContent = "";
+
+    var tags = h("div", { class: "tags" });
+    if (example) tags.appendChild(h("span", { class: "tag", text: "Chiffres d'exemple" }));
+    if (updated) tags.appendChild(h("span", { text: "Mis à jour le " + updated }));
+    if (a.live === "discord") tags.appendChild(h("span", { text: "Mise à jour automatique" }));
+    if (a.live === "roblox") tags.appendChild(h("span", { text: "API publique" }));
+    var head = h("div", { class: "panel-head", style: "--k:0" },
+      h("div", {}, h("p", { class: "eyebrow", text: eyebrow }), h("h3", { text: a.name })),
+      tags
+    );
+    var tiles = h("div", { class: "tiles", style: "--k:1" });
+    items.forEach(function (it, k) {
+      var v = h("span", { class: "v" + (typeof it.value === "number" ? "" : " txt") });
+      if (typeof it.value === "number") {
+        if (animate) countUp(v, it.value, it.decimals, it.suffix);
+        else v.textContent = fr(it.value, it.decimals) + (it.suffix || "");
+      } else v.textContent = it.value;
+      tiles.appendChild(h("div", { class: "tile", style: "--k:" + k }, h("span", { class: "l", text: it.label }), v));
+    });
+    var btn = h("a", { class: "btn", style: "--k:2", href: a.url, target: "_blank", rel: "noopener noreferrer", text: cta + " ↗" });
+    panel.appendChild(head);
+    panel.appendChild(tiles);
+    if (note) panel.appendChild(h("p", {
+      class: "activity-note" + (robloxActivity.status === "error" ? " error" : ""),
+      text: note
+    }));
+    panel.appendChild(btn);
+
+    wrap.classList.add("open");
+    wrap.removeAttribute("aria-hidden");
+    panel.removeAttribute("inert");
+  }
+  function refreshLive() {
+    if (panelReady && (accounts[active].live === "discord" || accounts[active].live === "roblox")) buildPanel(false);
+  }
+
+  /* ---------- Navigation du paquet ---------- */
+  function go(i, dir) {
+    var old = active;
+    var d = dir !== undefined ? dir : (i > old ? 1 : -1);
+    active = ((i % total) + total) % total;
+    if (active === old) return;
+    if (d > 0) {
+      var out = cards[old];
+      out.setAttribute("data-exit", "left");
+      setTimeout(function () { out.removeAttribute("data-exit"); }, 600);
+    }
+    var incoming = cards[active];
+    incoming.setAttribute("data-enter", d > 0 ? "next" : "prev");
+    setTimeout(function () { incoming.removeAttribute("data-enter"); }, 600);
+    paint();
+    restartProgress();
+  }
+  function paint() {
+    cards.forEach(function (c, idx) {
+      var off = (idx - active + total) % total;
+      c.setAttribute("data-pos", off < 3 ? String(off) : "hide");
+      if (off === 0) { c.removeAttribute("inert"); c.removeAttribute("aria-hidden"); }
+      else { c.setAttribute("inert", ""); c.setAttribute("aria-hidden", "true"); }
+    });
+    dots.forEach(function (dt, idx) {
+      if (idx === active) dt.setAttribute("aria-current", "true");
+      else dt.removeAttribute("aria-current");
+    });
+    buildPanel(true);
+  }
+
+  /* Lecture automatique : démarre quand le paquet est visible, s'arrête au premier geste */
+  var autoTimer = null, autoStopped = !CONFIG.autoplayMs, stageVisible = false;
+  dotsEl.style.setProperty("--auto-ms", CONFIG.autoplayMs + "ms");
+  function stopTimer() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+  function restartProgress() {
+    dotsEl.classList.remove("auto");
+    if (autoTimer) { void dotsEl.offsetWidth; dotsEl.classList.add("auto"); }
+  }
+  function startAuto() {
+    stopTimer();
+    if (autoStopped || reduceMotion() || !stageVisible) { dotsEl.classList.remove("auto"); return; }
+    autoTimer = setInterval(function () { go(active + 1, 1); }, CONFIG.autoplayMs);
+    restartProgress();
+  }
+  function userAction() {
+    autoStopped = true;
+    stopTimer();
+    dotsEl.classList.remove("auto");
+  }
+
+  $("d-prev").addEventListener("click", function () { userAction(); go(active - 1, -1); });
+  $("d-next").addEventListener("click", function () { userAction(); go(active + 1, 1); });
+  stage.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") { e.preventDefault(); userAction(); go(active - 1, -1); }
+    if (e.key === "ArrowRight") { e.preventDefault(); userAction(); go(active + 1, 1); }
+  });
+  var startX = null;
+  stage.addEventListener("pointerdown", function (e) { startX = e.clientX; });
+  stage.addEventListener("pointerup", function (e) {
+    if (startX === null) return;
+    var dx = e.clientX - startX;
+    startX = null;
+    if (Math.abs(dx) > 45) { userAction(); go(active + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); }
+  });
+  stage.addEventListener("pointercancel", function () { startX = null; });
+  stage.addEventListener("pointermove", function (e) {
+    var c = cards[active];
+    if (!c || e.pointerType === "touch") return;
+    var r = c.getBoundingClientRect();
+    c.style.setProperty("--mx", (e.clientX - r.left) + "px");
+    c.style.setProperty("--my", (e.clientY - r.top) + "px");
+  });
+  stage.addEventListener("pointerenter", function () { if (autoTimer) { stopTimer(); dotsEl.classList.remove("auto"); } });
+  stage.addEventListener("pointerleave", function () { if (!autoStopped) startAuto(); });
+  stage.addEventListener("focusin", function () { userAction(); });
+
+  var played = false;
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        stageVisible = en.isIntersecting;
+        if (en.isIntersecting && !played && !reduceMotion()) {
+          played = true;
+          stage.classList.add("play");
+          setTimeout(function () { stage.classList.remove("play"); }, 1600);
+        }
+        if (en.isIntersecting) startAuto(); else { stopTimer(); dotsEl.classList.remove("auto"); }
+      });
+    }, { threshold: 0.35 }).observe(stage);
+  }
+
+  panelReady = true;
+  paint();
+
+  /* Le statut démarre en dernier, une fois le paquet prêt */
+  poll();
+  connect();
+  setInterval(function () { if (!socketOpen && pollFails < 3) poll(); }, 30000);
+})();
+</script>
