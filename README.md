@@ -47,7 +47,9 @@ Bienvenue sur mon profil GitHub ! Je suis un passionné d'informatique, de déve
 ## 📌 Projets mis en avant
 
 <!-- PINNED-REPOS-START -->
-Chargement des dépôts épinglés...
+| Dépôt | Description | Langage | Étoiles |
+|---|---|---|---|
+| [GitHub-Desk](https://github.com/BEGY02300/GitHub-Desk) | Application de bureau en français pour gérer les dépôts, branches, pull requests et issues GitHub sur Windows, macOS et Linux. | Python | ⭐ 1 |
 <!-- PINNED-REPOS-END -->
 
 **Plus de projets :** [Voir tous mes repositories](https://github.com/BEGY02300?tab=repositories)
@@ -59,13 +61,24 @@ Chargement des dépôts épinglés...
 ### Commits par année
 
 <!-- COMMITS-START -->
-Chargement...
+```text
+2024  ░░░░░░░░░░░░░░░░░░░░     0
+2025  ░░░░░░░░░░░░░░░░░░░░     0
+2026  ████████████████████    23
+
+Total : 23 commits
+```
 <!-- COMMITS-END -->
 
 ### Langages les plus utilisés
 
 <!-- LANGUAGES-START -->
-Chargement...
+```text
+HTML         ████████████████████   42.8 %
+Python       ████████████████░░░░   34.8 %
+JavaScript   █████████░░░░░░░░░░░   19.3 %
+CSS          █░░░░░░░░░░░░░░░░░░░    3.0 %
+```
 <!-- LANGUAGES-END -->
 
 *Mis à jour automatiquement chaque jour par GitHub Actions.*
