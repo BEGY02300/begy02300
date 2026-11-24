@@ -43,14 +43,14 @@ Bienvenue sur mon profil GitHub ! Je suis un passionné d'informatique, de déve
 ![3D Printing](https://img.shields.io/badge/3D_PRINTING-00A98F?style=for-the-badge&logo=printables&logoColor=white)
 ## 📂 Quelques projets
 
-| Projet | Description |
-|---|---|
-| 🧠 **LLM Local Dev** | Expérimentations autour de l'IA locale |
-| 🔧 **ToolHub** | Collection d'outils et d'expérimentations |
-| 🎮 **GameHub** | Projet autour de l'univers du gaming |
-| 🤖 **DiscordCleanerBot** | Bot Discord |
-| 📡 **Web Radio Collège** | Projet de radio sur le Web |
-| 🖨️ **Creality K1 Backup** | Sauvegardes et configurations de mon imprimante 3D |
+## 🚀 Featured Projects
+
+<!-- PINNED-REPOS-START -->
+Loading pinned repositories...
+<!-- PINNED-REPOS-END -->
+
+**Plus de projets :** [Voir tous mes repositories](https://github.com/BEGY02300?tab=repositories)
+
 
 Retrouve mes autres projets directement dans mes repositories !
 
