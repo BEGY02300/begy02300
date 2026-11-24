@@ -59,7 +59,9 @@ Curieux de sciences (maths, physique), j'avance par essais successifs : je crée
 ## 📌 Projets mis en avant
 
 <!-- PINNED-REPOS-START -->
-_Mise à jour automatique en cours…_
+| Dépôt | Description | Langage | Étoiles |
+|---|---|---|---|
+| [GitHub-Desk](https://github.com/BEGY02300/GitHub-Desk) | Application de bureau en français pour gérer les dépôts, branches, pull requests et issues GitHub sur Windows, macOS et Linux. | Python | ⭐ 1 |
 <!-- PINNED-REPOS-END -->
 
 [Voir tous mes dépôts →](https://github.com/BEGY02300?tab=repositories)
