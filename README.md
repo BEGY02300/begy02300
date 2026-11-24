@@ -68,19 +68,11 @@ _Mise à jour automatique en cours…_
 
 ## 📊 Activité
 
-**Commits par année**
+<div align="center">
+  <img src="assets/profile/activity.svg" alt="Statistiques GitHub : ancienneté du compte, abonnés, abonnements, étoiles, commits par année et langages" width="100%" />
+</div>
 
-<!-- COMMITS-START -->
-_Mise à jour automatique en cours…_
-<!-- COMMITS-END -->
-
-**Langages les plus utilisés**
-
-<!-- LANGUAGES-START -->
-_Mise à jour automatique en cours…_
-<!-- LANGUAGES-END -->
-
-<sub>Données mises à jour chaque jour par GitHub Actions (dépôts publics).</sub>
+<sub>Carte générée chaque jour par GitHub Actions (dépôts publics).</sub>
 
 <div align="center">
 
