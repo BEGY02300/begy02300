@@ -17,7 +17,9 @@ Je m'appelle Auguste, je vis en France et j'apprends le développement en constr
 ## Projets
 
 <!-- PINNED-REPOS-START -->
-_Mise à jour automatique en cours…_
+<div align="center">
+<a href="https://github.com/BEGY02300/GitHub-Desk"><img src="assets/profile/project-0.svg" alt="GitHub-Desk" width="49%"></a>
+</div>
 <!-- PINNED-REPOS-END -->
 
 ## Activité
