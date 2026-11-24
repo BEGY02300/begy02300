@@ -41,24 +41,44 @@ Bienvenue sur mon profil GitHub ! Je suis un passionné d'informatique, de déve
 ![Ollama](https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white)
 ![Blender](https://img.shields.io/badge/Blender-E87D0D?style=for-the-badge&logo=blender&logoColor=white)
 ![3D Printing](https://img.shields.io/badge/3D_PRINTING-00A98F?style=for-the-badge&logo=printables&logoColor=white)
-## 📂 Quelques projets
 
-## 🚀 Featured Projects
+---
+
+## 📌 Projets mis en avant
 
 <!-- PINNED-REPOS-START -->
-Loading pinned repositories...
+Chargement des dépôts épinglés...
 <!-- PINNED-REPOS-END -->
 
 **Plus de projets :** [Voir tous mes repositories](https://github.com/BEGY02300?tab=repositories)
 
+---
 
-Retrouve mes autres projets directement dans mes repositories !
+## 📊 Mon activité
 
-## 📊 GitHub Stats
+### Commits par année
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=BEGY02300&show_icons=true&theme=github_dark&hide_border=true&include_all_commits=true)
+<!-- COMMITS-START -->
+Chargement...
+<!-- COMMITS-END -->
 
-![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=BEGY02300&layout=compact&theme=github_dark&hide_border=true)
+### Langages les plus utilisés
+
+<!-- LANGUAGES-START -->
+Chargement...
+<!-- LANGUAGES-END -->
+
+*Mis à jour automatiquement chaque jour par GitHub Actions.*
+
+### 🐍 Contributions
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/BEGY02300/begy02300/output/github-snake-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/BEGY02300/begy02300/output/github-snake.svg" />
+  <img alt="Snake animation des contributions" src="https://raw.githubusercontent.com/BEGY02300/begy02300/output/github-snake.svg" />
+</picture>
+
+---
 
 ## 🎯 Objectif
 
