@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Generate profile card and README sections
+      - name: Generate profile cards and README sections
         run: node .github/scripts/update-readme.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md assets/profile/activity.svg
+          git add README.md assets/profile
           if git diff --staged --quiet; then
             echo "Aucun changement"
           else
