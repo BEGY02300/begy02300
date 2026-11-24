@@ -25,7 +25,7 @@ Bienvenue sur mon profil GitHub ! Je suis un passionné d'informatique, de déve
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![CSS](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 
 **Outils & environnements**
 
@@ -40,8 +40,7 @@ Bienvenue sur mon profil GitHub ! Je suis un passionné d'informatique, de déve
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 ![Ollama](https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white)
 ![Blender](https://img.shields.io/badge/Blender-E87D0D?style=for-the-badge&logo=blender&logoColor=white)
-![3D Printing](https://img.shields.io/badge/3D_Printing-00A98F?style=for-the-badge&logo=creality&logoColor=white)
-
+![3D Printing](https://img.shields.io/badge/3D_PRINTING-00A98F?style=for-the-badge&logo=printables&logoColor=white)
 ## 📂 Quelques projets
 
 | Projet | Description |
