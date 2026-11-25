@@ -18,7 +18,10 @@ Je m'appelle Auguste, je vis en France et j'apprends le développement en constr
 
 <!-- PINNED-REPOS-START -->
 <div align="center">
-<a href="https://github.com/BEGY02300/GitHub-Desk"><img src="assets/profile/project-0.svg" alt="GitHub-Desk" width="49%"></a>
+<a href="https://github.com/BEGY02300/begy02300"><img src="assets/profile/project-0.svg" alt="begy02300" width="49%"></a>
+<a href="https://github.com/BEGY02300/deporte-motor"><img src="assets/profile/project-1.svg" alt="deporte-motor" width="49%"></a>
+<a href="https://github.com/BEGY02300/GitHub-Desk"><img src="assets/profile/project-2.svg" alt="GitHub-Desk" width="49%"></a>
+<a href="https://github.com/BEGY02300/adb-toolkit"><img src="assets/profile/project-3.svg" alt="adb-toolkit" width="49%"></a>
 </div>
 <!-- PINNED-REPOS-END -->
 
